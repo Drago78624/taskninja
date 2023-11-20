@@ -1,12 +1,19 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import React, { useRef, useState } from "react";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import React, { useEffect, useRef, useState } from "react";
 import { db } from "../firebase-config";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const AddModal = () => {
-  const addModalRef = useRef()
+const UpdateModal = (props) => {
+  const [t, setT] = useState(props.status);
+  const updateModalRef = useRef();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -24,21 +31,29 @@ const AddModal = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const addTask = async (data) => {
-    await addDoc(collection(db, "tasks"), {
+  const updateTask = async (data) => {
+    await updateDoc(doc(db, "tasks", props.id), {
       title: data.title,
       status: data.status == "completed" ? true : false,
       timestamp: serverTimestamp(),
     });
     reset();
-    addModalRef.current.close()
+    updateModalRef.current.close();
   };
 
+  useEffect(() => {
+    setT(props.status);
+  }, [props.status]);
+
   return (
-    <dialog id="add_modal" ref={addModalRef} className="modal">
+    <dialog
+      id={`update_modal_${props.id}`}
+      ref={updateModalRef}
+      className="modal"
+    >
       <div className="modal-box">
-        <h3 className="font-bold text-2xl mb-4">ADD TASK</h3>
-        <form method="dialog" onSubmit={handleSubmit(addTask)}>
+        <h3 className="font-bold text-2xl mb-4">UPDATE TASK</h3>
+        <form method="dialog" onSubmit={handleSubmit(updateTask)}>
           <div className="form-control w-full mb-2 ">
             <label className="label">
               <span className="label-text text-lg">Title</span>
@@ -46,6 +61,7 @@ const AddModal = () => {
             <input
               type="text"
               className="input input-bordered w-full text-lg"
+              defaultValue={props.title}
               {...register("title")}
             />
           </div>
@@ -57,12 +73,24 @@ const AddModal = () => {
               className="select select-bordered w-full text-lg"
               {...register("status")}
             >
-              <option value="incomplete">Incomplete</option>
-              <option value="completed">Completed</option>
+              <option
+                //selected={!props.status}
+                value="incomplete"
+              >
+                Incomplete
+              </option>
+              <option
+                //selected={props.status}
+                value="completed"
+              >
+                Completed
+              </option>
             </select>
           </div>
           <div className="flex gap-1">
-            <button className="btn btn-primary text-lg mr-3">Add Task</button>
+            <button className="btn btn-primary text-lg mr-3">
+              Update Task
+            </button>
           </div>
         </form>
       </div>
@@ -73,4 +101,4 @@ const AddModal = () => {
   );
 };
 
-export default AddModal;
+export default UpdateModal;

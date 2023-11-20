@@ -5,8 +5,13 @@ import AddModal from "./components/AddModal";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 
 const App = () => {
+  const [filter, setFilter] = useState("all")
   const [theme, setTheme] = useState("dark");
   const [isDarkMode, setDarkMode] = useState(true);
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
 
   const toggleDarkMode = (checked) => {
     const newTheme = isDarkMode ? "light" : "dark";
@@ -33,20 +38,20 @@ const App = () => {
       <div className="flex justify-between mb-4">
         <button
           className="btn btn-primary text-lg"
-          onClick={() => document.getElementById("my_modal_2").showModal()}
+          onClick={() => document.getElementById("add_modal").showModal()}
         >
           Add Task
         </button>
         {createPortal(<AddModal />, document.getElementById("body"))}
         <div>
-          <select className="select select-bordered w-full max-w-xs text-lg">
-            <option selected>All</option>
-            <option>Completed</option>
-            <option>Incomplete</option>
+          <select value={filter} onChange={handleFilterChange} className="select select-bordered w-full max-w-xs text-lg">
+            <option value={"all"}>All</option>
+            <option value={"completed"}>Completed</option>
+            <option value={"incomplete"}>Incomplete</option>
           </select>
         </div>
       </div>
-      <Tasks />
+      <Tasks filter={filter} />
     </div>
   );
 };

@@ -5,14 +5,11 @@ import AddModal from "./components/AddModal";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 
 const App = () => {
-  const [filter, setFilter] = useState("all")
+  const [filter, setFilter] = useState("all");
   const [theme, setTheme] = useState("dark");
   const [isDarkMode, setDarkMode] = useState(true);
 
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-
+  // CHANGING THEME MODE
   const toggleDarkMode = (checked) => {
     const newTheme = isDarkMode ? "light" : "dark";
     setTheme(newTheme);
@@ -22,6 +19,7 @@ const App = () => {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
   return (
     <div className="container mx-auto p-2 max-w-5xl">
       <div className="flex justify-center py-4">
@@ -44,7 +42,11 @@ const App = () => {
         </button>
         {createPortal(<AddModal />, document.getElementById("body"))}
         <div>
-          <select value={filter} onChange={handleFilterChange} className="select select-bordered w-full max-w-xs text-lg">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="select select-bordered w-full max-w-xs text-lg"
+          >
             <option value={"all"}>All</option>
             <option value={"completed"}>Completed</option>
             <option value={"incomplete"}>Incomplete</option>

@@ -24,9 +24,12 @@ const Task = (props) => {
   }, [props.status]);
 
   useEffect(() => {
-    updateDoc(doc(db, "tasks", props.id), {
-      status: taskCompleted,
-    });
+    const updateTask = async () => {
+      await updateDoc(doc(db, "tasks", props.id), {
+        status: taskCompleted,
+      });
+    };
+    updateTask();
   }, [taskCompleted]);
 
   return (
@@ -35,12 +38,17 @@ const Task = (props) => {
         <input
           type="checkbox"
           checked={taskCompleted}
-          onChange={() => setTaskCompleted(!taskCompleted)}
+          value={taskCompleted}
+          onChange={() => setTaskCompleted((prev) => !prev)}
           className="checkbox"
         />
         <div className="divider divider-horizontal m-1"></div>
         <div>
-          <h3 className={`text-lg ${taskCompleted && "line-through text-gray-700"}`}>
+          <h3
+            className={`text-lg ${
+              taskCompleted && "line-through text-gray-700"
+            }`}
+          >
             {props.title}
           </h3>
           <p>{props.date}</p>
@@ -58,7 +66,7 @@ const Task = (props) => {
         {createPortal(
           <UpdateModal
             title={props.title}
-            status={props.status}
+            status={taskCompleted}
             id={props.id}
           />,
           document.getElementById("body")

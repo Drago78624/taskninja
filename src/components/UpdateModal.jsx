@@ -1,10 +1,4 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../firebase-config";
 import { useForm } from "react-hook-form";
@@ -12,10 +6,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const UpdateModal = (props) => {
-  const [t, setT] = useState(props.status);
+  const [t, setT] = useState(props.status)
   const updateModalRef = useRef();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
 
   const formSchema = yup.object().shape({
     title: yup.string().required("Please enter a title"),
@@ -31,10 +23,14 @@ const UpdateModal = (props) => {
     resolver: yupResolver(formSchema),
   });
 
+  const resetForm = () => {
+    reset();
+  };
+
   const updateTask = async (data) => {
     await updateDoc(doc(db, "tasks", props.id), {
       title: data.title,
-      status: data.status == "completed" ? true : false,
+      status: t,
       timestamp: serverTimestamp(),
     });
     reset();
@@ -71,20 +67,11 @@ const UpdateModal = (props) => {
             </label>
             <select
               className="select select-bordered w-full text-lg"
-              {...register("status")}
+              value={t ? "completed" : "incomplete"}
+              onChange={e => setT(e.target.value)}
             >
-              <option
-                //selected={!props.status}
-                value="incomplete"
-              >
-                Incomplete
-              </option>
-              <option
-                //selected={props.status}
-                value="completed"
-              >
-                Completed
-              </option>
+              <option value="incomplete">Incomplete</option>
+              <option value="completed">Completed</option>
             </select>
           </div>
           <div className="flex gap-1">
@@ -95,7 +82,7 @@ const UpdateModal = (props) => {
         </form>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button>close</button>
+        <button onClick={resetForm}>close</button>
       </form>
     </dialog>
   );
